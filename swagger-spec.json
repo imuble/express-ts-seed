@@ -1,0 +1,29 @@
+{
+    "swaggerDefinition": {
+        "info": {
+            "title": "Sample API",
+            "version": "1.0.0"
+        },
+        "produces": [
+            "application/json"
+        ],
+        "consumes": [
+            "application/json"
+        ],
+        "securityDefinitions": {
+            "jwt": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            }
+        },
+        "security": [
+            {
+                "jwt": []
+            }
+        ]
+    },
+    "apis": [
+        "dist/routes/authentication/endpoints/*"
+    ]
+}

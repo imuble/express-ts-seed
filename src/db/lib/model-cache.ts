@@ -8,6 +8,7 @@ class ModelCache<T> {
 
     constructor(maximumEntries: number = 1000, deleteBulk: number = 25) {
         this.cache = {};
+        this.deleteQueue = [];
         this.maximumEntries = maximumEntries;
         this.deleteBulk = deleteBulk;
     }

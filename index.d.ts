@@ -1,11 +1,7 @@
 declare interface ITokenPayload {
     id: string;
     type: string;
-}
-
-declare enum TokenTypes {
-    ACCESS_TOKEN = "ACCESS_TOKEN",
-    REFRESH_TOKEN = "REFRESH_TOKEN"
+    logoutVersion?: number;
 }
 
 declare module Express {

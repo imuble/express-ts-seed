@@ -6,7 +6,6 @@ import UserDTO from '../../../dto/user';
 interface IRegisterBody {
     username: string;
     password: string;
-    type: string;
 }
 interface IRegisterResponseBody {
     user: UserDTO;
@@ -24,9 +23,9 @@ export default async function (req: Request, res: Response, next: Function) {
     const body: IRegisterBody = req.body;
 
     try {
-        const user = await createUser(body.username, body.password, body.type);
+        const user = await createUser(body.username, body.password);
 
-        const tokens = await signTokens(user._id);
+        const tokens = await signTokens(user._id, user.logoutVersion);
     
         const responseBody: IRegisterResponseBody = {
             user: new UserDTO(user),

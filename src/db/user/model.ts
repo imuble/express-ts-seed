@@ -9,8 +9,11 @@ interface IHashPassword {
     (password: string): Promise<string>
 }
 export interface IUser extends mongoose.Document {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
+    fbId?: string;
+
+    logoutVersion: number;
 
     //functions
     verifyPassword: IVerifyPassword;
@@ -18,8 +21,11 @@ export interface IUser extends mongoose.Document {
 }
 
 export const UserSchema = new mongoose.Schema({
-    username: { required: true, type: String, index: { unique: true } },
-    password: { required: true, type: String },
+    username: { type: String, index: { unique: true, sparse: true } },
+    password: { type: String },
+    fbId: { type: String, index: { unique: true, sparse: true } },
+
+    logoutVersion: { type: Number, default: 0 } 
 });
 
 const verifyPassword: IVerifyPassword = function (password: string): Promise<boolean> {

@@ -4,8 +4,8 @@ function start(environmentFileSource, typingsFileDestination) {
     const environmentVariables = fs.readFileSync(environmentFileSource).toString()
         .split('\n')
         .filter((line) => { return (line) ? true : false; })
-        .map((line) => { return line.split('=')[0] });
-    const variables = environmentVariables.reduce((acc, current) => { return `${acc}${current}:string;` }, '');
+        .map((line) => { return { name: line.split('=')[0], type: typeof(line.split('=')[1]) } });
+    const variables = environmentVariables.reduce((acc, current) => { console.log(current.type); return `${acc}${current.name}:${current.type};` }, '');
 
     const fileExists = fs.existsSync(typingsFileDestination);
 

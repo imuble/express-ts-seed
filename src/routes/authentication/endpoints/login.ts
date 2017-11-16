@@ -34,7 +34,7 @@ export default async function (req: Request, res: Response, next: Function) {
             return res.status(401).send();
         }
 
-        const tokens = await signTokens(user._id);
+        const tokens = await signTokens(user._id, user.logoutVersion);
 
         const responseBody: ILoginResponseBody = {
             user: new UserDTO(user),

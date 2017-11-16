@@ -1,8 +1,8 @@
 import UserDTO from '../../../dto/user';
 import { ITokens, signTokens } from './../lib/sign-token';
-import { Request, Response } from 'express';
-//import { createFbUser } from '../../../db/user/repository';
-import { verifyTokenAndFetchUserFromFacebook } from '../lib/facebook-util';
+import { Request, Response }  from 'express';
+import { createFbUser, findUserByFbId }  from '../../../db/user/repository';
+import { isTokenCheckResponseValid, getFbIdByToken, getFbUserById }  from '../lib/facebook-util';
 
 interface IFacebookLoginRequestBody {
     fbToken: string;
@@ -15,7 +15,7 @@ function isValidBody(object: any): object is IFacebookLoginRequestBody {
     return 'fbToken' in object;
 }
 export default async function (req: Request, res: Response, next: Function) {
-    
+
     if (!isValidBody(req.body)) {
         return res.status(422).send();
     }
@@ -23,18 +23,25 @@ export default async function (req: Request, res: Response, next: Function) {
     const body: IFacebookLoginRequestBody = req.body;
 
     try {
-        const user = await verifyTokenAndFetchUserFromFacebook(body.fbToken);
-        if (user === null) {
-            return res.status(400).send();
+
+        let tokenCheckResponse = await getFbIdByToken(body.fbToken);
+        let isValid = isTokenCheckResponseValid(tokenCheckResponse.data);
+        if (!isValid) {
+            return res.status(401).send();
         }
-        
-        /* TODO: implement database storage and return user with accesstokens */
-        //const user = await createFbUser(user);
-        //const tokens = await signTokens(user._id);
-        //responseBody: IFacebookLoginResponseBody = { user: new UserDTO(user), tokens: tokens };
-        //return res.status(200).send(responseBody);
+
+        let fbUserId = tokenCheckResponse.data.user_id;
+        let user = await findUserByFbId(fbUserId);
+
+        if (!user) {
+            let fbUser = await getFbUserById(fbUserId);
+            user = await createFbUser(fbUser.id);
+        }
+        const tokens = await signTokens(user._id, user.logoutVersion);
+        const responseBody: IFacebookLoginResponseBody = { user: new UserDTO(user), tokens: tokens };
+        return res.status(200).send(responseBody);
     }
-    catch(e) {
+    catch (e) {
         console.log(e);
         return res.status(500).send();
     }

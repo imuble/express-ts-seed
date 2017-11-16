@@ -28,23 +28,7 @@ interface FacebookUser {
     email?: string;
 }
 
-export async function verifyTokenAndFetchUserFromFacebook(fbToken: string): Promise<FacebookUser | null> {
-
-    let tokenCheckResponse = await getFbIdByToken(fbToken);
-
-    let isValid = isTokenCheckResponseValid(tokenCheckResponse.data);
-    if (!isValid) {
-        return null;
-    }
-
-    let fbUserId = tokenCheckResponse.data.user_id;
-
-    let fbUser = await getFbUserById(fbUserId);
-
-    return fbUser
-}
-
-function getFbIdByToken(token: string): Promise<TokenCheckResponse> {
+export function getFbIdByToken(token: string): Promise<TokenCheckResponse> {
     return new Promise((resolve, reject) => {
         https.get('https://graph.facebook.com/debug_token?input_token=' + token + '&access_token=' + appToken, function (res) {
             var body = '';
@@ -62,7 +46,7 @@ function getFbIdByToken(token: string): Promise<TokenCheckResponse> {
     });
 }
 
-function getFbUserById(id: string): Promise<FacebookUser> {
+export function getFbUserById(id: string): Promise<FacebookUser> {
 
     let path = '/v2.7/' + id + '?fields=name,email';
 
@@ -101,8 +85,9 @@ export function isTokenCheckResponseValid(data: TokenCheckData): Boolean {
         return false
     }
 
+
     /* Check if the requesting token is linked with our app id */
-    if (data.app_id !== process.env.FACEBOOK_APP_ID) {
+    if (data.app_id.valueOf() !== new String(process.env.FB_APP_ID).valueOf()) {
         return false
     }
 

@@ -1,5 +1,5 @@
 import * as env from 'dotenv';
-import Application from './App'
-
 env.config();
+
+import Application from './App'
 const app = new Application();
